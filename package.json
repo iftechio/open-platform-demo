@@ -1,0 +1,31 @@
+{
+  "name": "open-platform-demo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "deploy": "gulp cdn && gulp upload",
+    "upload": "npm run build && npm run deploy"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "jike-open-js-sdk": "^0.1.2",
+    "normalize.css": "^8.0.0",
+    "qs": "^6.5.2",
+    "vue": "^2.5.17"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.0.1",
+    "@vue/cli-plugin-eslint": "^3.0.1",
+    "@vue/cli-service": "^3.0.1",
+    "fancy-log": "^1.3.2",
+    "gulp": "^3.9.1",
+    "gulp-qiniu": "^0.2.4",
+    "shelljs": "^0.8.2",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.2",
+    "vue-template-compiler": "^2.5.17"
+  }
+}
