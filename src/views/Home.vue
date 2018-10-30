@@ -4,8 +4,7 @@
     <template v-else>
       <UserInfo :screenName="screenName" />
       <AudioPlayer
-        type="ORIGINAL_POST"
-        :messageId="list[current].id"
+        type="ORIGINAL_POST"        
         :pictureUrl="list[current].pictureUrl"
         :title="list[current].title"
         :encodeUrl="list[current].url"
@@ -18,7 +17,6 @@
 
 <script>
 // @ is an alias to /src
-import qs from 'qs'
 import UserInfo from '@/components/UserInfo.vue'
 import AudioPlayer from '@/components/AudioPlayer.vue'
 import Loading from '@/components/Loading.vue'
@@ -45,7 +43,7 @@ export default {
     },
   },
   async created () {
-    const { topic: topicId } = qs.parse(window.location.search.slice(1))
+    const { topic: topicId } = { topic: '5a1ccf936e6e7c0011037480' } // 「最近听了什么歌」 主题ID
     const { data } = await getMusicList(topicId)
     this.list = data.playlist
     this.current = 0

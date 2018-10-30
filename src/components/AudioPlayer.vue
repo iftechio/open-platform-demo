@@ -7,10 +7,10 @@
   >
     <audio
       ref="audio"
-      :src="url"
-      @play="onAudioPlay"
-      @pause="onAudioStop"
-      @ended="onAudioStop"
+      :src="url"  
+      @play="playing = true"
+      @pause="playing = false"
+      @ended="next"
       @timeupdate="timeupdate"
     >
       您的浏览器不支持 audio 标签。
@@ -26,7 +26,7 @@
         @click.stop="play"
       />
     </div>
-    <div class="info" @click="onInfoClick">
+    <div class="info" >
       <h1 class="title">{{ title.split('-')[1] }}</h1>
       <h3 class="author">{{ title.split('-')[0] }}</h3>
     </div>
@@ -40,7 +40,6 @@
 // @ is an alias to /src
 import { getAudioMeta } from '@/api'
 
-const audioList = []
 export default {
   name: 'AudioPlayer',
   components: {},
@@ -51,75 +50,52 @@ export default {
   },
   data () {
     return {
-      originalLink: '',
       playing: false,
       progress: '0',
       url: '',
-      nextPlaying: false,
     }
   },
   methods: {
-    onInfoClick () {},
     async fetchAudioMeta () {
       const { data } = await getAudioMeta(this.encodeUrl)
       this.url = data.url
     },
+    async mounted () {
+      await this.fetchAudioMeta()
+    },
+    
     play () {
-      if (!this.playing) {
-        audioList.forEach((audio) => {
-          audio.pause()
-        })
-        this.$refs.audio.play()
-      } else {
-        this.$refs.audio.pause()
-      }
+      this.playing ? this.$refs.audio.pause() : this.$refs.audio.play()
+    },
+    async next () {
+      await this.$emit('next')
+      this.$nextTick(async () => {
+        await this.fetchAudioMeta()
+        if (this.playing) {
+          this.$refs.audio.play()
+        }
+      })
+    },
+    async before () {
+      await this.$emit('before')
+      this.$nextTick(async () => {
+        await this.fetchAudioMeta()
+        if (this.playing) {
+          this.$refs.audio.play()
+        }
+      })
     },
     async timeupdate () {
       if (this.$refs.audio.currentTime && this.$refs.audio.duration) {
         this.progress = `${(this.$refs.audio.currentTime / this.$refs.audio.duration) * 100}%`
         if ((this.$refs.audio.currentTime / this.$refs.audio.duration) === 1) {
-          await this.next()
+          this.$refs.audio.play()
         }
       }
     },
-    onAudioPlay () {
-      this.playing = true
-      this.nextPlaying = true
-    },
-    async onAudioStop () {
-      this.playing = false
-      this.nextPlaying = false
-    },
-    async next () {
-      this.playing = false
-      await this.$emit('next')
-      // TODO: DRY
-      this.$nextTick(async () => {
-        await this.fetchAudioMeta()
-        if (this.nextPlaying) {
-          this.play()
-        }
-      })
-    },
-    async before () {
-      this.playing = false
-      await this.$emit('before')
-      // TODO: DRY
-      this.$nextTick(async () => {
-        await this.fetchAudioMeta()
-        if (this.nextPlaying) {
-          this.play()
-        }
-      })
-    },
+
   },
-  async mounted () {
-    audioList.push(this.$refs.audio)
-    await this.fetchAudioMeta()
-  },
-  beforeDestroy () {
-    audioList.splice(audioList.indexOf(this.$refs.audio), 1)
-  },
+
 }
 </script>
 <style lang="stylus" scoped>
