@@ -123,7 +123,7 @@ export default {
 </script>
 <style lang="stylus" scoped>
 .audio-mini-player
-  width 100%
+  width 90%
   position relative
   display flex
   justify-content space-between
@@ -132,9 +132,9 @@ export default {
   height 100px
   border-radius 10px
   background #ffe411
-  border 10px solid #404040
+  border 3px solid #ffffff9c
   transition all 0.3s linear
-
+  box-shadow 0px 4px 21px 0px rgba(121, 108, 16, 0.24)
 // .audio-mini-player.playing
 //   border-top-left-radius 40px
 //   border-bottom-left-radius 40px
@@ -153,6 +153,7 @@ export default {
   background-repeat no-repeat
   background-size 100% 100%
   transition all 0.3s linear
+  border-radius 3px
 .cover::after
   content ''
   display block
@@ -263,9 +264,10 @@ button:focus
   &.left
     border-top-left-radius 10px
     border-bottom-left-radius 10px
-    border-right 1px solid #404040
+    border-right 2px solid #ffffff7a
   &.right
     border-top-right-radius 10px
     border-bottom-right-radius 10px
-    border-left 1px solid #404040
+    border-left 2px solid #ffffff7a
+
 </style>

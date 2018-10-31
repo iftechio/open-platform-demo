@@ -16,6 +16,9 @@ export default {
 <style lang="stylus" scoped>
 .userInfo
   width 100%
-  text-align center
-  padding 5px 10px
+  text-align: left;
+  padding: 7px 24px;
+  font-size: 15px;
+  color: #636363;
+  font-weight: 800;
 </style>
