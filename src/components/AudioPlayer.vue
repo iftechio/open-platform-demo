@@ -129,7 +129,7 @@ export default {
   justify-content space-between
   align-items center
   overflow hidden
-  height 80px
+  height 100px
   border-radius 10px
   background #ffe411
   border 10px solid #404040
