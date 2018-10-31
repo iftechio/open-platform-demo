@@ -10,7 +10,7 @@
       :src="url"
       @play="onAudioPlay"
       @pause="onAudioStop"
-      @ended="onAudioStop"
+      @ended="onAudioEnd"
       @timeupdate="timeupdate"
     >
       您的浏览器不支持 audio 标签。
@@ -26,7 +26,7 @@
         @click.stop="play"
       />
     </div>
-    <div class="info" @click="onInfoClick">
+    <div class="info" >
       <h1 class="title">{{ title.split('-')[1] }}</h1>
       <h3 class="author">{{ title.split('-')[0] }}</h3>
     </div>
@@ -59,7 +59,6 @@ export default {
     }
   },
   methods: {
-    onInfoClick () {},
     async fetchAudioMeta () {
       const { data } = await getAudioMeta(this.encodeUrl)
       this.url = data.url
@@ -74,43 +73,39 @@ export default {
         this.$refs.audio.pause()
       }
     },
-    async timeupdate () {
-      if (this.$refs.audio.currentTime && this.$refs.audio.duration) {
-        this.progress = `${(this.$refs.audio.currentTime / this.$refs.audio.duration) * 100}%`
-        if ((this.$refs.audio.currentTime / this.$refs.audio.duration) === 1) {
-          await this.next()
-        }
+    timeupdate () {
+      const { currentTime, duration } = this.$refs.audio
+      if (currentTime && duration) {
+        this.progress = `${(currentTime / duration) * 100}%`
       }
     },
     onAudioPlay () {
       this.playing = true
       this.nextPlaying = true
     },
-    async onAudioStop () {
+    onAudioStop () {
       this.playing = false
       this.nextPlaying = false
     },
-    async next () {
-      this.playing = false
-      await this.$emit('next')
-      // TODO: DRY
-      this.$nextTick(async () => {
-        await this.fetchAudioMeta()
-        if (this.nextPlaying) {
-          this.play()
-        }
-      })
+    onAudioEnd () {
+      this.nextPlaying = true
+      this.next()
     },
-    async before () {
+    next () {
       this.playing = false
-      await this.$emit('before')
-      // TODO: DRY
-      this.$nextTick(async () => {
-        await this.fetchAudioMeta()
-        if (this.nextPlaying) {
-          this.play()
-        }
-      })
+      this.$emit('next')
+      this.$nextTick(this.makeItWork)
+    },
+    before () {
+      this.playing = false
+      this.$emit('before')
+      this.$nextTick(this.makeItWork)
+    },
+    async makeItWork () {
+      await this.fetchAudioMeta()
+      if (this.nextPlaying) {
+        this.play()
+      }
     },
   },
   async mounted () {
@@ -128,11 +123,11 @@ export default {
   position relative
   display flex
   justify-content space-between
+  align-items center
   overflow hidden
-  height 100px
-  background #ffe411
+  height 80px
   border-radius 10px
-  border 10px solid #404040
+  background #ffe411
   transition all 0.3s linear
 
 // .audio-mini-player.playing

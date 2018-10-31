@@ -44,16 +44,21 @@ export default {
       return this.screenName && this.list.length > 0
     },
   },
-  async created () {
-    const { topic: topicId } = qs.parse(window.location.search.slice(1))
-    const { data } = await getMusicList(topicId)
-    this.list = data.playlist
-    this.current = 0
-
-    const { user: { screenName } } = await sdk.getUserInfo()
-    this.screenName = screenName
+  created () {
+    this.fetchPlayList()
+    this.fetchUserInfo()
   },
   methods: {
+    async fetchPlayList() {
+      const { topic: topicId } = qs.parse(window.location.search.slice(1))
+      const { data } = await getMusicList(topicId)
+      this.list = data.playlist
+      this.current = 0
+    },
+    async fetchUserInfo() {
+      const { user: { screenName } } = await sdk.getUserInfo()
+      this.screenName = screenName
+    },
     nextMusic () {
       this.current++
     },
@@ -67,12 +72,13 @@ export default {
 </script>
 <style lang="stylus" scoped>
 .home
-  padding 10px
   width 100%
+  height 100%
   display flex
   flex-direction column
   align-items center
   justify-content center
+  align-items center
   box-sizing border-box
   background-color #fff
 </style>

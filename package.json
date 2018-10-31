@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "jike-open-js-sdk": "^0.1.2",
+    "jike-open-js-sdk": "^0.1.4",
     "normalize.css": "^8.0.0",
     "qs": "^6.5.2",
     "vue": "^2.5.17"
