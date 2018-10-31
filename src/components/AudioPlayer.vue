@@ -15,7 +15,9 @@
     >
       您的浏览器不支持 audio 标签。
     </audio>
-    <div class="ctrl-btn left" @click="before"> ◀◀ </div>
+    <div class="ctrl-btn left" @click="before">
+      <img src="../assets/skip_next.png" />
+    </div>
     <div
       class="cover"
       :style="{ backgroundImage: `url(${pictureUrl})` }"
@@ -33,7 +35,9 @@
     <div class="progress">
       <div :style="{ width: progress }"></div>
     </div>
-    <div class="ctrl-btn right" @click="next"> ▶▶ </div>
+    <div class="ctrl-btn right" @click="next">
+      <img src="../assets/skip_next.png" />
+    </div>
   </div>
 </template>
 <script>
@@ -123,7 +127,7 @@ export default {
 </script>
 <style lang="stylus" scoped>
 .audio-mini-player
-  width 90%
+  width 95%
   position relative
   display flex
   justify-content space-between
@@ -259,12 +263,17 @@ button:focus
   justify-content center
   padding 0px 20px
   height 100%
-  width 50px
+  width 55px
   color #000000
+  & > img
+    width 40px
+    height 40px
   &.left
     border-top-left-radius 10px
     border-bottom-left-radius 10px
     border-right 2px solid #ffffff7a
+    img
+      transform rotate(180deg)
   &.right
     border-top-right-radius 10px
     border-bottom-right-radius 10px
