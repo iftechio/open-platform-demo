@@ -132,6 +132,7 @@ export default {
   height 80px
   border-radius 10px
   background #ffe411
+  border 10px solid #404040
   transition all 0.3s linear
 
 // .audio-mini-player.playing
