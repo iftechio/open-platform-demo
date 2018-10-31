@@ -26,7 +26,7 @@
         @click.stop="play"
       />
     </div>
-    <div class="info" >
+    <div class="info" @click="onInfoClick">
       <h1 class="title">{{ title.split('-')[1] }}</h1>
       <h3 class="author">{{ title.split('-')[0] }}</h3>
     </div>
@@ -48,6 +48,7 @@ export default {
     pictureUrl: { type: String, default: '' },
     title: { type: String, default: '' },
     encodeUrl: { type: String, default: '' },
+    messageUrl: { type: String, default: '' },
   },
   data () {
     return {
@@ -107,6 +108,9 @@ export default {
         this.play()
       }
     },
+    onInfoClick() {
+      window.location.href = this.messageUrl
+    }
   },
   async mounted () {
     audioList.push(this.$refs.audio)

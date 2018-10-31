@@ -5,9 +5,8 @@
       <UserInfo :screenName="screenName" />
       <AudioPlayer
         type="ORIGINAL_POST"
+        v-bind="list[current]"
         :messageId="list[current].id"
-        :pictureUrl="list[current].pictureUrl"
-        :title="list[current].title"
         :encodeUrl="list[current].url"
         @next="nextMusic"
         @before="beforeMusic"
