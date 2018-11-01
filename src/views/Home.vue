@@ -4,9 +4,7 @@
     <template v-else>
       <UserInfo :screenName="screenName" />
       <AudioPlayer
-        type="ORIGINAL_POST"
         v-bind="list[current]"
-        :messageId="list[current].id"
         :encodeUrl="list[current].url"
         @next="nextMusic"
         @before="beforeMusic"
@@ -59,12 +57,12 @@ export default {
       this.screenName = screenName
     },
     nextMusic () {
-      this.current++
+      // make this list loop
+      this.current = (this.current + 1) % this.list.length
     },
     beforeMusic () {
-      if (this.current !== 0) {
-        this.current--
-      }
+      // make this list loop
+      this.current = (this.current - 1 + this.list.length) % this.list.length
     },
   },
 }

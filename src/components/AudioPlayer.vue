@@ -44,7 +44,6 @@
 // @ is an alias to /src
 import { getAudioMeta } from '@/api'
 
-const audioList = []
 export default {
   name: 'AudioPlayer',
   components: {},
@@ -56,11 +55,9 @@ export default {
   },
   data () {
     return {
-      originalLink: '',
       playing: false,
       progress: '0',
       url: '',
-      nextPlaying: false,
     }
   },
   methods: {
@@ -69,14 +66,7 @@ export default {
       this.url = data.url
     },
     play () {
-      if (!this.playing) {
-        audioList.forEach((audio) => {
-          audio.pause()
-        })
-        this.$refs.audio.play()
-      } else {
-        this.$refs.audio.pause()
-      }
+      this.playing ? this.$refs.audio.pause() : this.$refs.audio.play()
     },
     timeupdate () {
       const { currentTime, duration } = this.$refs.audio
@@ -86,30 +76,25 @@ export default {
     },
     onAudioPlay () {
       this.playing = true
-      this.nextPlaying = true
     },
     onAudioStop () {
       this.playing = false
-      this.nextPlaying = false
     },
     onAudioEnd () {
-      this.nextPlaying = true
       this.next()
     },
     next () {
-      this.playing = false
       this.$emit('next')
       this.$nextTick(this.makeItWork)
     },
     before () {
-      this.playing = false
       this.$emit('before')
       this.$nextTick(this.makeItWork)
     },
     async makeItWork () {
       await this.fetchAudioMeta()
-      if (this.nextPlaying) {
-        this.play()
+      if (this.playing) {
+        this.$refs.audio.play()
       }
     },
     onInfoClick() {
@@ -117,11 +102,7 @@ export default {
     }
   },
   async mounted () {
-    audioList.push(this.$refs.audio)
     await this.fetchAudioMeta()
-  },
-  beforeDestroy () {
-    audioList.splice(audioList.indexOf(this.$refs.audio), 1)
   },
 }
 </script>
