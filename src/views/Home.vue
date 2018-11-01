@@ -21,7 +21,6 @@ import UserInfo from '@/components/UserInfo.vue'
 import AudioPlayer from '@/components/AudioPlayer.vue'
 import Loading from '@/components/Loading.vue'
 import { sdk } from '@/main'
-import { getMusicList } from '@/api'
 
 export default {
   name: 'home',
@@ -44,16 +43,27 @@ export default {
   },
   async created () {
     const { topic: topicId } = { topic: '5a1ccf936e6e7c0011037480' } // 「最近听了什么歌」 主题ID
-    const { data } = await getMusicList(topicId)
-    this.list = data.playlist
-    this.current = 0
-
     const { user: { screenName } } = await sdk.getUserInfo()
+    const { data } = await sdk.getMessages(topicId)
+    const songs = data.messages.filter(msg => msg.linkInfo && msg.linkInfo.audio)
+    const playlist = songs.map(f => {
+      return {
+        url:  f.linkInfo.linkUrl, 
+        id: f.id, 
+        title: f.linkInfo.title,
+        pictureUrl: f.linkInfo.pictureUrl,
+      }
+    })
+
     this.screenName = screenName
+    this.list = playlist
+    this.current = 0
   },
   methods: {
     nextMusic () {
-      this.current++
+      if(this.current < this.list.length-1) {
+        this.current++
+      }
     },
     beforeMusic () {
       if (this.current !== 0) {

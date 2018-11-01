@@ -1,10 +1,167 @@
 ### 立即开始：一个简单的小例子
 
-在这个例子里，我们会开发一个主题插件应用 Music-Playlist-Player。这个插件将「最近听了什么歌」这个主题下的热门歌曲整理后依次播放。
+在这个例子里，我们会开发一个主题插件应用 Music-Playlist-Player。这个插件将主题「最近听了什么歌」下的歌曲整理后播放。
 
-这个插件使用了两个权限：`默认权限` 和 `主题插件权限`。
+为了完成这个功能，首先要获得该主题下的动态和用户信息，然后过滤出有歌曲的动态，再提取出歌曲相关的信息，最后让播放器播放歌曲列表。
 
-主要代码如下。
+开始前，请完成以下流程：
+
+0. 一些准备
+- 注册开发者账号
+- 注册应用 
+- 等待审核结果
+审核通过后，你的应用会有一个唯一的`OPEN_APP_ID`，在`JikeOpenJsSDK`中配置你的`OPEN_APP_ID`后，就可以调用`JikeOpenJsSDK`提供的API了。
+
+那么如何配置呢？
+- 安装sdk： `npm install jike-open-js-sdk -s`
+- 在你的项目里引入`JikeOpenJsSDK`
+```js
+import { JikeOpenJsSDK } from 'jike-open-js-sdk'
+```
+- 新建`JikeOpenJsSDK`
+```js
+const OPEN_APP_ID = 'your_open_app_id'  
+const sdk = new JikeOpenJsSDK(OPEN_APP_ID)
+```
+- 调用`JikeOpenJsSDK`提供的方法前，请确保`JikeOpenJsSDK`处于ready状态:
+```js
+await sdk.ready() 
+```
+
+接下来就可以使用`JikeOpenJsSDK`完成一个音乐播放器了。
+
+
+1. 如何获得该主题下的动态和用户信息呢？
+  `JikeOpenJsSDK`提供了 ***获取某主题下的热门动态*** 的API，直接调用sdk的相应方法即可：
+  ```const { data } = await sdk.getMessages(topicId) ```
+  这个API会返回如下数据：
+
+  ```json
+  { "data": 
+    {
+      "messages": [
+        {
+          "id": "5bd93e46e594d30011d6ac7b",
+          "content": "2003年王磊和法国著名dub乐队High Tone 合作了一张叫 Wang Tone的专辑，2005年发行。现在听来都不落后于当下这个时代甚至还有点超前。\n\n推荐其中的这首「弼马温」，摇头晃脑的这个劲，又重又欢乐，特别适合中年养生快乐摇。\n\n这个慢慢摇的弼马温比起西游记电视剧里那个啾啾啾就踩着筋斗云远去的孙悟空，就好比罚点球助跑的博格巴之于比100米决赛的博尔特。",
+          "urlsInText": [],
+          "createdAt": "2018-10-31T05:31:50.609Z",
+          "user": {
+            "id": "37C33654-E7B2-40DE-A870-DE1CED640E66",
+            "screenName": "alissi",
+            "profileImage": {
+              "thumbnailUrl": "https://cdn.ruguoapp.com/FuBFMX1Szgf0pie_HSuFeg48vb0W.jpg?imageMogr2/auto-orient/format/jpeg/thumbnail/120x120%3E/quality/30",
+              "middlePicUrl": "https://cdn.ruguoapp.com/FuBFMX1Szgf0pie_HSuFeg48vb0W.jpg?imageMogr2/auto-orient/format/jpeg/thumbnail/300x300%3E/quality/30",
+              "picUrl": "https://cdn.ruguoapp.com/FuBFMX1Szgf0pie_HSuFeg48vb0W.jpg?imageMogr2/auto-orient/format/jpeg/thumbnail/1000x1000%3E/quality/30",
+              "format": "jpeg"
+            }
+          },
+          "linkInfo": {
+            "title": "High Tone - Bi Ma Wen Le palefrenier des ecuries celestes",
+            "pictureUrl": "https://pic-txcdn.ruguoapp.com/FrSjF7xCZpRLbR2NyYnd_2ja7aUK?imageMogr2/auto-orient/heic-exif/1/format/jpeg?imageView2/0/w/160/h/160/q/80",
+            "linkUrl": "https://h.xiami.com/song.html?id=1770908622",
+            "audio": {
+              "author": "High Tone",
+              "title": "Bi Ma Wen Le palefrenier des ecuries celestes"
+            }
+          }
+        },
+        {
+          "id": "5bd921bcdd25bb0011ff39c1",
+          "content": "金庸先生已然千古，想到那刀光剑影快意恩仇的武侠世界，你印象最深的是哪首歌？课代表最喜欢的还是这首周华健的《刀剑如梦》",
+          "urlsInText": [],
+          "createdAt": "2018-10-31T03:30:04.528Z",
+          "user": {
+            "id": "yinyuekedaibiao",
+            "screenName": "音乐课代表",
+            "profileImage": {
+              "thumbnailUrl": "https://cdn.ruguoapp.com/FuN-_CooKqaxeTpuWm8-q_0BUd-t.jpg?imageMogr2/auto-orient/format/jpeg/thumbnail/120x120%3E/quality/30",
+              "middlePicUrl": "https://cdn.ruguoapp.com/FuN-_CooKqaxeTpuWm8-q_0BUd-t.jpg?imageMogr2/auto-orient/format/jpeg/thumbnail/300x300%3E/quality/30",
+              "picUrl": "https://cdn.ruguoapp.com/FuN-_CooKqaxeTpuWm8-q_0BUd-t.jpg?imageMogr2/auto-orient/format/jpeg/thumbnail/1000x1000%3E/quality/30",
+              "format": "jpeg"
+            }
+          },
+          "linkInfo": {
+            "title": "周华健 - 刀剑如梦",
+            "pictureUrl": "https://pic-txcdn.ruguoapp.com/FuCvS00ApGCS2thw6Wnl3kD9xjtp?imageMogr2/auto-orient/heic-exif/1/format/jpeg?imageView2/0/w/160/h/160/q/80",
+            "linkUrl": "https://music.163.com/#/song?id=186315",
+            "audio": {
+              "author": "周华健",
+              "title": "刀剑如梦"
+            }
+          }
+        },
+        {
+          "id": "5bd68640bbd881001782dd70",
+          "content": "参加了鹅厂的《创造101》后3unshine的公司发力运营，近日还给组合成员Cindy发布新单曲《不正确的审美》并拍摄了新MV\n\n出道以来，3unshine的业务能力一直备受争议，但从《朵蜜》到《不正确的审美》，整个团体和公司表现出的审美能力与制作水准还是得到了不少肯定。这次C皇的新单请到一线EDM制作人陈星翰（编曲过蔡依林冠单《PLAY 我呸》）合作，词曲来自老板张铠麟\n\n课代表认为单从这首新单的整体成色来看即便不如大爆过的《朵蜜》，不过在这今年发过的女团歌里，有很多方面的确技高一筹。围绕这首歌的讨论主要集中于：1.C皇虽有进步业务能力提升但仍驾驭不了高水平的歌曲制作和包装；2.高配资源打造的单曲匠气很重少了3unshine原本散发的野生活力\n\n在听完这首歌后，各位即友怎么评价C皇的新单呢？欢迎友善讨论~",
+          "urlsInText": [],
+          "createdAt": "2018-10-29T04:02:08.874Z",
+          "user": {
+            "id": "yinyuekedaibiao",
+            "screenName": "音乐课代表",
+            "profileImage": {
+              "thumbnailUrl": "https://cdn.ruguoapp.com/FuN-_CooKqaxeTpuWm8-q_0BUd-t.jpg?imageMogr2/auto-orient/format/jpeg/thumbnail/120x120%3E/quality/30",
+              "middlePicUrl": "https://cdn.ruguoapp.com/FuN-_CooKqaxeTpuWm8-q_0BUd-t.jpg?imageMogr2/auto-orient/format/jpeg/thumbnail/300x300%3E/quality/30",
+              "picUrl": "https://cdn.ruguoapp.com/FuN-_CooKqaxeTpuWm8-q_0BUd-t.jpg?imageMogr2/auto-orient/format/jpeg/thumbnail/1000x1000%3E/quality/30",
+              "format": "jpeg"
+            }
+          }
+        }
+      ]
+    },
+    "count": 3,
+  }
+  ```
+同样的，`JikeOpenJsSDK`提供了 ***获取当前用户信息*** 的API：
+  ```js
+  const { user: { screenName } } = await sdk.getUserInfo()
+  ```
+这个API会返回如下数据：
+  ```json
+  {
+    "data": {
+      "user": {
+        "id": "F87FE5F2-B047-4810-AAB2-2C1D51157dd9D",
+        "screenName": "hhh",
+        "profileImage": {
+            "thumbnailUrl": "https://cdn.ruguoapp.com/FlcID8NOEZqlxzG4MARIwA6tmwIa.jpg?imageMogr2/auto-orient/format/jpeg/thumbnail/120x120>/quality/30",
+            "middlePicUrl": "https://cdn.ruguoapp.com/alcID8NOEZqlxzG4MARIwA6tmwId.jpg?imageMogr2/auto-orient/format/jpeg/thumbnail/300x300>/quality/30",
+            "picUrl": "https://cdn.ruguoapp.com/FlcIa8NOEZqlxzG4MARIwA6tmwId.jpg?imageMogr2/auto-orient/format/jpeg/thuabnail/1000x1000>/quality/30",
+            "format": "jpeg"
+        },
+        "isLoginUser": true
+      }
+    }
+  }
+  ```
+
+2. 过滤出包含歌曲的动态
+并不是每条动态都包含歌曲，所以要过滤出包含歌曲的动态: 
+  ```js
+  const songs = data.messages.filter(msg => msg.linkInfo && msg.linkInfo.audio)
+  ```
+
+3. 提取出歌曲相关的信息 
+返回的数据包含的信息很多，但音乐播放器拿到这些信息即可：
+  - 动态id 
+  - 歌曲名称title 
+  - 歌曲封面pictureUrl 
+  - 歌曲的网页链接linkUrl
+将这些信息整理为一个歌曲列表：
+  ```js
+  const playlist = songs.map(s => {
+    return {
+      url:  s.linkInfo.linkUrl, 
+      id: s.id, 
+      title: s.linkInfo.title,
+      pictureUrl: s.linkInfo.pictureUrl,
+    }
+  })
+  ```
+这里的linkUrl仅为歌曲的网页链接，为了获得音频链接，仍需解析，这里只用了即刻的音频解析服务。
+
+4. 完成播放器相关的前端任务。
+
+### 前端部分
 
 #### 运行
 
@@ -65,7 +222,6 @@ const init = async () => {
 init()
 ```
 
-- 调用JikeOpenJsSDK提供的方法前，务必调用`await sdk.ready() `，确保JikeOpenJsSDK处于ready状态。
 - OPEN_APP_ID请安全保存，此处仅作举例。
 
 #### Home.vue
@@ -159,7 +315,6 @@ async created () {
 ```
 
 `<audio>`的`timeupdate`事件每个tick都会触发，进而调用其绑定的`timeupdate`方法，这个方法会更新播放进度条，并且当播放完毕时，自动播放下一首。
-
 
 ```js
 {
