@@ -7,15 +7,17 @@
   >
     <audio
       ref="audio"
-      :src="url"  
-      @play="playing = true"
-      @pause="playing = false"
-      @ended="next"
+      :src="url"
+      @play="onAudioPlay"
+      @pause="onAudioStop"
+      @ended="onAudioEnd"
       @timeupdate="timeupdate"
     >
       您的浏览器不支持 audio 标签。
     </audio>
-    <div class="ctrl-btn left" @click="before"> ◀◀ </div>
+    <div class="ctrl-btn left" @click="before">
+      <img src="../assets/skip_next.png" />
+    </div>
     <div
       class="cover"
       :style="{ backgroundImage: `url(${pictureUrl})` }"
@@ -33,7 +35,9 @@
     <div class="progress">
       <div :style="{ width: progress }"></div>
     </div>
-    <div class="ctrl-btn right" @click="next"> ▶▶ </div>
+    <div class="ctrl-btn right" @click="next">
+      <img src="../assets/skip_next.png" />
+    </div>
   </div>
 </template>
 <script>
@@ -47,6 +51,7 @@ export default {
     pictureUrl: { type: String, default: '' },
     title: { type: String, default: '' },
     encodeUrl: { type: String, default: '' },
+    messageUrl: { type: String, default: '' },
   },
   data () {
     return {
@@ -60,57 +65,61 @@ export default {
       const { data } = await getAudioMeta(this.encodeUrl)
       this.url = data.url
     },
-    async mounted () {
-      await this.fetchAudioMeta()
-    },
-    
     play () {
       this.playing ? this.$refs.audio.pause() : this.$refs.audio.play()
     },
-    async next () {
-      await this.$emit('next')
-      this.$nextTick(async () => {
-        await this.fetchAudioMeta()
-        if (this.playing) {
-          this.$refs.audio.play()
-        }
-      })
-    },
-    async before () {
-      await this.$emit('before')
-      this.$nextTick(async () => {
-        await this.fetchAudioMeta()
-        if (this.playing) {
-          this.$refs.audio.play()
-        }
-      })
-    },
-    async timeupdate () {
-      if (this.$refs.audio.currentTime && this.$refs.audio.duration) {
-        this.progress = `${(this.$refs.audio.currentTime / this.$refs.audio.duration) * 100}%`
-        if ((this.$refs.audio.currentTime / this.$refs.audio.duration) === 1) {
-          this.$refs.audio.play()
-        }
+    timeupdate () {
+      const { currentTime, duration } = this.$refs.audio
+      if (currentTime && duration) {
+        this.progress = `${(currentTime / duration) * 100}%`
       }
     },
-
+    onAudioPlay () {
+      this.playing = true
+    },
+    onAudioStop () {
+      this.playing = false
+    },
+    onAudioEnd () {
+      this.next()
+    },
+    next () {
+      this.$emit('next')
+      this.$nextTick(this.makeItWork)
+    },
+    before () {
+      this.$emit('before')
+      this.$nextTick(this.makeItWork)
+    },
+    async makeItWork () {
+      await this.fetchAudioMeta()
+      if (this.playing) {
+        this.$refs.audio.play()
+      }
+    },
+    onInfoClick() {
+      window.location.href = this.messageUrl
+    }
   },
-
+  async mounted () {
+    await this.fetchAudioMeta()
+  },
 }
 </script>
 <style lang="stylus" scoped>
 .audio-mini-player
-  width 100%
+  width 95%
   position relative
   display flex
   justify-content space-between
+  align-items center
   overflow hidden
   height 100px
-  background #ffe411
   border-radius 10px
-  border 10px solid #404040
+  background #ffe411
+  border 3px solid #ffffff9c
   transition all 0.3s linear
-
+  box-shadow 0px 4px 21px 0px rgba(121, 108, 16, 0.24)
 // .audio-mini-player.playing
 //   border-top-left-radius 40px
 //   border-bottom-left-radius 40px
@@ -129,6 +138,7 @@ export default {
   background-repeat no-repeat
   background-size 100% 100%
   transition all 0.3s linear
+  border-radius 3px
 .cover::after
   content ''
   display block
@@ -234,14 +244,20 @@ button:focus
   justify-content center
   padding 0px 20px
   height 100%
-  width 50px
+  width 55px
   color #000000
+  & > img
+    width 40px
+    height 40px
   &.left
     border-top-left-radius 10px
     border-bottom-left-radius 10px
-    border-right 1px solid #404040
+    border-right 2px solid #ffffff7a
+    img
+      transform rotate(180deg)
   &.right
     border-top-right-radius 10px
     border-bottom-right-radius 10px
-    border-left 1px solid #404040
+    border-left 2px solid #ffffff7a
+
 </style>

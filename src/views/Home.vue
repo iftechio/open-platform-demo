@@ -4,9 +4,7 @@
     <template v-else>
       <UserInfo :screenName="screenName" />
       <AudioPlayer
-        type="ORIGINAL_POST"        
-        :pictureUrl="list[current].pictureUrl"
-        :title="list[current].title"
+        v-bind="list[current]"
         :encodeUrl="list[current].url"
         @next="nextMusic"
         @before="beforeMusic"
@@ -60,27 +58,36 @@ export default {
     this.current = 0
   },
   methods: {
+    async fetchPlayList() {
+      const { topic: topicId } = qs.parse(window.location.search.slice(1))
+      const { data } = await getMusicList(topicId)
+      this.list = data.playlist
+      this.current = 0
+    },
+    async fetchUserInfo() {
+      const { user: { screenName } } = await sdk.getUserInfo()
+      this.screenName = screenName
+    },
     nextMusic () {
-      if(this.current < this.list.length-1) {
-        this.current++
-      }
+      // make this list loop
+      this.current = (this.current + 1) % this.list.length
     },
     beforeMusic () {
-      if (this.current !== 0) {
-        this.current--
-      }
+      // make this list loop
+      this.current = (this.current - 1 + this.list.length) % this.list.length
     },
   },
 }
 </script>
 <style lang="stylus" scoped>
 .home
-  padding 10px
   width 100%
+  height 100%
   display flex
   flex-direction column
   align-items center
-  justify-content center
+  justify-content flex-start
+  align-items center
   box-sizing border-box
   background-color #fff
 </style>
