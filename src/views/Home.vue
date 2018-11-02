@@ -4,8 +4,7 @@
     <template v-else>
       <UserInfo :screenName="screenName" />
       <AudioPlayer
-        v-bind="list[current]"
-        :encodeUrl="list[current].url"
+        v-bind="list[current].linkInfo"
         @next="nextMusic"
         @before="beforeMusic"
       />
@@ -20,7 +19,6 @@ import UserInfo from '@/components/UserInfo.vue'
 import AudioPlayer from '@/components/AudioPlayer.vue'
 import Loading from '@/components/Loading.vue'
 import { sdk } from '@/main'
-import { getMusicList } from '@/api'
 
 export default {
   name: 'home',
@@ -48,8 +46,8 @@ export default {
   methods: {
     async fetchPlayList() {
       const { topic: topicId } = qs.parse(window.location.search.slice(1))
-      const { data } = await getMusicList(topicId)
-      this.list = data.playlist
+      const data = await sdk.getMessages(topicId)
+      this.list = data.messages.filter(msg => msg.linkInfo && msg.linkInfo.audio)
       this.current = 0
     },
     async fetchUserInfo() {

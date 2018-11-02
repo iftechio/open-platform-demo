@@ -50,7 +50,7 @@ export default {
   props: {
     pictureUrl: { type: String, default: '' },
     title: { type: String, default: '' },
-    encodeUrl: { type: String, default: '' },
+    linkUrl: { type: String, default: '' },
     messageUrl: { type: String, default: '' },
   },
   data () {
@@ -62,7 +62,7 @@ export default {
   },
   methods: {
     async fetchAudioMeta () {
-      const { data } = await getAudioMeta(this.encodeUrl)
+      const { data } = await getAudioMeta(this.linkUrl)
       this.url = data.url
     },
     play () {
