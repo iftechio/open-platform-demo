@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <home />
+    <home/>
   </div>
 </template>
 <script>
-import Home from '@/views/Home.vue'
+import Home from "@/views/Home.vue";
 
 export default {
   components: {
-    Home,
-  },
-}
+    Home
+  }
+};
 </script>
 
 <style lang="stylus">
@@ -21,7 +21,7 @@ export default {
   -webkit-font-smoothing antialiased
   -moz-osx-font-smoothing grayscale
   color #2c3e50
-  background-color #ffffff
+  background-color transparent
 html, body, div
   box-sizing border-box
   margin 0px
